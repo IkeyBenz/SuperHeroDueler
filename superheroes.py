@@ -33,7 +33,6 @@ class Hero:
         self.health -= damage
         if self.health <= 0:
             self.deaths += 1
-            return 'Died'
 
     def add_kill(self, numberOfKills):
         self.kills += numberOfKills
@@ -93,7 +92,8 @@ class Team:
         damage = damage / len(self.heroes)
         deadHeros = 0
         for hero in self.heroes:
-            if hero.take_damage(damage) == 'Died':
+            hero.take_damage(damage)
+            if hero.health <= 0:
                 deadHeros += 1
         return deadHeros
 
