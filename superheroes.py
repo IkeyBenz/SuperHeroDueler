@@ -122,3 +122,67 @@ class Armor:
 
     def defend(self):
         return randint(0, self.defenseStrength)
+
+class Arena:
+    def __init__(self):
+        self.team_one = self.build_team_one()
+        self.team_two = self.build_team_two()
+    
+    def build_team(self):
+        teamName = input('Enter the name for this team: ')
+        teamHeros = []
+        keepAddingHeroes = True
+        while keepAddingHeroes:
+            print('Adding a hero to your team...')
+            newHero = Hero(input('What is the name of this hero? '))
+            newHero.abilities.append(self.getAdditionsForHero('ability', newHero.name))
+            newHero.abilities.append(self.getAdditionsForHero('weapon', newHero.name))
+            newHero.armors.append(self.getAdditionsForHero('armor', newHero.name))
+            teamHeros.append(newHero)
+            keepAddingHeroes = self.yesOrNo('Do you want to add another hero to ' + teamName + '? ')
+        newTeam = Team(teamName)
+        newTeam.heroes = teamHeros
+        return newTeam
+
+    def getAdditionsForHero(self, additionType, heroName):
+        additions = []
+        if self.yesOrNo('Do you want to add ' + additionType + ' to ' + heroName + '? (y/n) '):
+            keepAsking = True
+            addition = Ability if additionType == 'ability' else Weapon if additionType == 'weapon' else Armor
+            while keepAsking:
+                name = input('What is this ' + additionType + ' called? ')
+                attackStrength = int(input('What is ' + name + "'s attack strength? "))
+                additions.append(addition(name, attackStrength))
+                keepAsking = self.yesOrNo('Do you want to add another ' + additionType + ' to this team? (y/n) ')
+        return additions
+
+    def yesOrNo(self, prompt):
+        res = input(prompt)
+        if res in ['Y', 'y', 'N', 'n']:
+            if res in 'Yy':
+                return True
+            return False
+        print('Response not recognized.')
+        return self.yesOrNo(prompt)
+
+    def build_team_one(self):
+        print('Building Team One...')
+        return self.build_team()
+
+    def build_team_two(self):
+        print('Building Team Two...')
+        return self.build_team()
+
+    def team_battle(self):
+        """
+        This method should continue to battle teams until 
+        one or both teams are dead.
+        """
+
+    def show_stats(self):
+        """
+        This method should print out the battle statistics 
+        including each heroes kill/death ratio.
+        """
+
+arena = Arena()
