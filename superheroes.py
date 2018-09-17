@@ -16,7 +16,7 @@ class Hero:
     def attack(self):
         if len(self.abilities) == 0:
             return 0
-        return sum([ability.attack() for ability in self.abilities])
+        return sum([a.attack() for a in self.abilities])
 
     def __repr__(self):
         string = 'Hero Name: ' + self.name
@@ -115,6 +115,12 @@ class Team:
         for hero in self.heroes:
             print(hero)
 
+    def stillStanding(self):
+        for hero in self.heroes:
+            if hero.health > 0:
+                return True
+        return False
+
 class Armor:
     def __init__(self, name, defenseStrength):
         self.name = name
@@ -130,18 +136,16 @@ class Arena:
     
     def build_team(self):
         teamName = input('Enter the name for this team: ')
-        teamHeros = []
+        newTeam = Team(teamName)
         keepAddingHeroes = True
         while keepAddingHeroes:
             print('Adding a hero to your team...')
             newHero = Hero(input('What is the name of this hero? '))
-            newHero.abilities.append(self.getAdditionsForHero('ability', newHero.name))
-            newHero.abilities.append(self.getAdditionsForHero('weapon', newHero.name))
-            newHero.armors.append(self.getAdditionsForHero('armor', newHero.name))
-            teamHeros.append(newHero)
+            newHero.abilities = self.getAdditionsForHero('ability', newHero.name)
+            newHero.abilities = self.getAdditionsForHero('weapon', newHero.name)
+            newHero.armors = self.getAdditionsForHero('armor', newHero.name)
+            newTeam.add_hero(newHero)
             keepAddingHeroes = self.yesOrNo('Do you want to add another hero to ' + teamName + '? ')
-        newTeam = Team(teamName)
-        newTeam.heroes = teamHeros
         return newTeam
 
     def getAdditionsForHero(self, additionType, heroName):
@@ -151,8 +155,8 @@ class Arena:
             addition = Ability if additionType == 'ability' else Weapon if additionType == 'weapon' else Armor
             while keepAsking:
                 name = input('What is this ' + additionType + ' called? ')
-                attackStrength = int(input('What is ' + name + "'s attack strength? "))
-                additions.append(addition(name, attackStrength))
+                strength = int(input('What is ' + name + "'s " + ('shield' if additionType == 'armor' else 'attack') + " strength? "))
+                additions.append(addition(name, strength))
                 keepAsking = self.yesOrNo('Do you want to add another ' + additionType + ' to this team? (y/n) ')
         return additions
 
@@ -174,15 +178,19 @@ class Arena:
         return self.build_team()
 
     def team_battle(self):
-        """
-        This method should continue to battle teams until 
-        one or both teams are dead.
-        """
+        while self.team_one.stillStanding() and self.team_two.stillStanding():
+            self.team_one.attack(self.team_two)
+            self.team_two.attack(self.team_one)
+        if self.team_one.stillStanding():
+            print(self.team_one.name, 'wins the fight!')
+        else:
+            print(self.team_two.name, 'wins the fight!')
 
     def show_stats(self):
-        """
-        This method should print out the battle statistics 
-        including each heroes kill/death ratio.
-        """
+       print('Battle Ended:')
+       self.team_one.stats()
+       self.team_two.stats()
 
 arena = Arena()
+arena.team_battle()
+arena.show_stats()
